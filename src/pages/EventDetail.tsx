@@ -28,7 +28,7 @@ export default function EventDetail() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="lg:col-span-2 rounded-xl overflow-hidden glow-blue"
+            className="lg:col-span-2 rounded-xl overflow-hidden glow-purple"
           >
             <img src={event.poster} alt={event.title} className="w-full aspect-[3/4] object-cover" />
           </motion.div>
@@ -111,7 +111,7 @@ export default function EventDetail() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="font-display font-bold text-lg">{tier.price} {tier.currency}</span>
-                      <button className="px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-blue hover:scale-105">
+                      <button className="px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-purple hover:scale-105">
                         Buy
                       </button>
                     </div>

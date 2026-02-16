@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, Twitter } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 const footerLinks = [
   { label: "FAQ", to: "/faq" },
@@ -21,7 +22,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="font-display text-lg font-bold text-gradient mb-3">ONE BIG PARTY</h3>
+            <img src={logo} alt="ONE BIG PARTY" className="h-12 w-auto mb-3" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Prague's premium nightlife experience. Curated events, verified tickets, unforgettable nights.
             </p>

@@ -48,7 +48,7 @@ export default function AdminLogin() {
           />
           <button
             type="submit"
-            className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-blue"
+            className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple"
           >
             Sign In
           </button>

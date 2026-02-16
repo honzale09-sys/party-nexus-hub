@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo.jpg";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -32,8 +33,8 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="font-display text-xl font-bold tracking-wider text-gradient">
-          ONE BIG PARTY
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="ONE BIG PARTY" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop */}
@@ -51,7 +52,7 @@ export default function Navbar() {
           ))}
           <Link
             to="/events"
-            className="px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-blue hover:scale-105"
+            className="px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-purple hover:scale-105"
           >
             Get Tickets
           </Link>

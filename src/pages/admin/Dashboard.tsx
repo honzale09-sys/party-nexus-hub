@@ -23,7 +23,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-display text-2xl font-bold">Dashboard</h1>
         <div className="flex gap-3">
-          <Link to="/admin/events" className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-blue">
+          <Link to="/admin/events" className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-all hover:glow-purple">
             + Create Event
           </Link>
           <Link to="/admin/products" className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm font-semibold hover:bg-surface-hover transition-colors">

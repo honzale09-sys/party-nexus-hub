@@ -77,7 +77,7 @@ export default function ProductDetail() {
             {/* Add to cart */}
             <button
               disabled={!product.inStock || !selectedSize}
-              className="mt-8 w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-blue hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              className="mt-8 w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-purple hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
               <ShoppingBag size={18} />
               {product.inStock ? "Add to Cart" : "Sold Out"}

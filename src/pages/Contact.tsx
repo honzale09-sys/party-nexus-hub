@@ -29,7 +29,7 @@ export default function Contact() {
                 <option value="other">Other</option>
               </select>
               <textarea placeholder="Your message" rows={5} className="w-full px-4 py-3 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground text-sm resize-none" />
-              <button type="submit" className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-blue">
+              <button type="submit" className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple">
                 Send Message
               </button>
             </form>
