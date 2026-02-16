@@ -82,7 +82,7 @@ export default function Tickets() {
           <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
             <input type="email" placeholder="Your email" className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm" />
             <input type="text" placeholder="Order ID" className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm" />
-            <button type="submit" className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-blue">
+            <button type="submit" className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple">
               Resend Ticket
             </button>
           </form>

@@ -6,51 +6,51 @@
 
 @layer base {
   :root {
-    --background: 230 25% 5%;
+    --background: 270 10% 4%;
     --foreground: 0 0% 95%;
 
-    --card: 230 20% 8%;
+    --card: 270 12% 7%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 230 20% 8%;
+    --popover: 270 12% 7%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 190 100% 50%;
-    --primary-foreground: 230 25% 5%;
+    --primary: 280 60% 65%;
+    --primary-foreground: 270 10% 4%;
 
-    --secondary: 270 80% 60%;
+    --secondary: 290 45% 50%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 230 15% 15%;
-    --muted-foreground: 230 10% 55%;
+    --muted: 270 10% 14%;
+    --muted-foreground: 270 8% 55%;
 
-    --accent: 280 100% 65%;
+    --accent: 300 70% 70%;
     --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 230 15% 18%;
-    --input: 230 15% 18%;
-    --ring: 190 100% 50%;
+    --border: 270 10% 16%;
+    --input: 270 10% 16%;
+    --ring: 280 60% 65%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 230 20% 7%;
+    --sidebar-background: 270 12% 6%;
     --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 190 100% 50%;
-    --sidebar-primary-foreground: 230 25% 5%;
-    --sidebar-accent: 230 15% 12%;
+    --sidebar-primary: 280 60% 65%;
+    --sidebar-primary-foreground: 270 10% 4%;
+    --sidebar-accent: 270 10% 12%;
     --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 230 15% 15%;
-    --sidebar-ring: 190 100% 50%;
+    --sidebar-border: 270 10% 14%;
+    --sidebar-ring: 280 60% 65%;
 
     /* Custom tokens */
-    --neon-blue: 190 100% 50%;
-    --neon-purple: 270 80% 60%;
-    --neon-pink: 320 100% 60%;
-    --surface: 230 18% 10%;
-    --surface-hover: 230 18% 14%;
+    --neon-purple: 280 60% 65%;
+    --neon-lilac: 290 50% 75%;
+    --neon-pink: 310 70% 60%;
+    --surface: 270 10% 9%;
+    --surface-hover: 270 10% 13%;
   }
 
   .dark {
@@ -72,23 +72,23 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--neon-blue))] to-[hsl(var(--neon-purple))];
-  }
-  .glow-blue {
-    box-shadow: 0 0 20px hsl(var(--neon-blue) / 0.3), 0 0 60px hsl(var(--neon-blue) / 0.1);
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(280,60%,65%)] to-[hsl(310,70%,70%)];
   }
   .glow-purple {
-    box-shadow: 0 0 20px hsl(var(--neon-purple) / 0.3), 0 0 60px hsl(var(--neon-purple) / 0.1);
+    box-shadow: 0 0 20px hsl(var(--neon-purple) / 0.4), 0 0 60px hsl(var(--neon-purple) / 0.15);
+  }
+  .glow-lilac {
+    box-shadow: 0 0 20px hsl(var(--neon-lilac) / 0.3), 0 0 60px hsl(var(--neon-lilac) / 0.1);
   }
   .neon-border {
-    border: 1px solid hsl(var(--neon-blue) / 0.3);
+    border: 1px solid hsl(var(--neon-purple) / 0.2);
   }
   .neon-border-hover:hover {
-    border-color: hsl(var(--neon-blue) / 0.6);
-    box-shadow: 0 0 15px hsl(var(--neon-blue) / 0.2);
+    border-color: hsl(var(--neon-purple) / 0.5);
+    box-shadow: 0 0 15px hsl(var(--neon-purple) / 0.2);
   }
   .glass {
     @apply backdrop-blur-xl;
-    background: hsl(var(--background) / 0.8);
+    background: hsl(var(--background) / 0.85);
   }
 }

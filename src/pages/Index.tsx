@@ -63,7 +63,7 @@ export default function Index() {
           >
             <Link
               to="/events"
-              className="px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-base transition-all hover:glow-blue hover:scale-105"
+              className="px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-base transition-all hover:glow-purple hover:scale-105"
             >
               View Parties
             </Link>
@@ -83,7 +83,7 @@ export default function Index() {
           Next <span className="text-gradient">Event</span>
         </h2>
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          <motion.div whileHover={{ scale: 1.02 }} className="rounded-xl overflow-hidden glow-blue">
+          <motion.div whileHover={{ scale: 1.02 }} className="rounded-xl overflow-hidden glow-purple">
             <img src={featured.poster} alt={featured.title} className="w-full aspect-video object-cover" />
           </motion.div>
           <div>
@@ -100,7 +100,7 @@ export default function Index() {
             </p>
             <Link
               to={`/events/${featured.slug}`}
-              className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-blue hover:scale-105"
+              className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-purple hover:scale-105"
             >
               Get Tickets <ArrowRight size={16} />
             </Link>
