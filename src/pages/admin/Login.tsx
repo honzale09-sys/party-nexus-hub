@@ -2,16 +2,36 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder - will use proper auth with Cloud
-    navigate("/admin");
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(email, password);
+        if (error) throw error;
+        toast.success("Account created! Ask an existing admin to grant you admin access.");
+      } else {
+        const { error } = await signIn(email, password);
+        if (error) throw error;
+        toast.success("Signed in!");
+        navigate("/admin");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,11 +45,11 @@ export default function AdminLogin() {
           <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
             <Lock size={24} className="text-primary" />
           </div>
-          <h1 className="font-display text-2xl font-bold">Admin Login</h1>
+          <h1 className="font-display text-2xl font-bold">{isSignUp ? "Create Account" : "Admin Login"}</h1>
           <p className="text-sm text-muted-foreground mt-1">ONE BIG PARTY Dashboard</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
             placeholder="Email"
@@ -45,14 +65,22 @@ export default function AdminLogin() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground text-sm"
             required
+            minLength={6}
           />
           <button
             type="submit"
-            className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple"
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple disabled:opacity-50"
           >
-            Sign In
+            {loading ? "..." : isSignUp ? "Create Account" : "Sign In"}
           </button>
         </form>
+        <button
+          onClick={() => setIsSignUp(!isSignUp)}
+          className="w-full text-center text-xs text-muted-foreground mt-4 hover:text-primary transition-colors"
+        >
+          {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+        </button>
       </motion.div>
     </div>
   );
