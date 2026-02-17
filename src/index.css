@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=General+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -90,5 +90,24 @@
   .glass {
     @apply backdrop-blur-xl;
     background: hsl(var(--background) / 0.85);
+  }
+
+  /* Smooth reveal animations */
+  .reveal-up {
+    animation: revealUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .reveal-up-delay-1 { animation-delay: 0.1s; }
+  .reveal-up-delay-2 { animation-delay: 0.2s; }
+  .reveal-up-delay-3 { animation-delay: 0.3s; }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
