@@ -37,7 +37,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="mb-12"
         >
-          <img src={logo} alt="ONE BIG PARTY" className="h-16 md:h-20 w-auto" />
+          <img src={logo} alt="ONE BIG PARTY" className="h-28 md:h-36 w-auto" />
         </motion.div>
 
         {/* Brand text */}
