@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, Twitter } from "lucide-react";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.png";
 
 const footerLinks = [
   { label: "FAQ", to: "/faq" },
