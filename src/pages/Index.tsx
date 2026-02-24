@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, QrCode, CreditCard, PartyPopper, Ticket } from "lucide-react";
+import { ArrowRight, QrCode, CreditCard, PartyPopper, Ticket, Camera } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useEvents, useProducts } from "@/hooks/useData";
 import EventCard from "@/components/EventCard";
@@ -122,6 +122,58 @@ export default function Index() {
             </motion.div>
           ))}
         </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="py-20 overflow-hidden">
+        <div className="container mx-auto px-4 mb-12">
+          <div className="flex items-center gap-3 justify-center mb-3">
+            <Camera size={20} className="text-primary" />
+            <h2 className="font-display text-3xl font-bold text-center">Party <span className="text-gradient">Gallery</span></h2>
+          </div>
+          <p className="text-center text-muted-foreground text-sm max-w-md mx-auto">Moments from our unforgettable nights in Prague</p>
+        </div>
+        {(() => {
+          const allImages = events.flatMap((e: any) => (e.gallery_urls || []).map((url: string) => ({ url, title: e.title })));
+          const galleryImages = allImages.length > 0 ? allImages.slice(0, 8) : [
+            { url: "/placeholder.svg", title: "Coming Soon" },
+            { url: "/placeholder.svg", title: "Coming Soon" },
+            { url: "/placeholder.svg", title: "Coming Soon" },
+            { url: "/placeholder.svg", title: "Coming Soon" },
+            { url: "/placeholder.svg", title: "Coming Soon" },
+            { url: "/placeholder.svg", title: "Coming Soon" },
+          ];
+          return (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 px-2 md:px-4">
+              {galleryImages.map((img, i) => (
+                <motion.div
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  whileHover={{ scale: 1.03 }}
+                  className={`relative overflow-hidden rounded-xl group cursor-pointer ${
+                    i === 0 ? "col-span-2 row-span-2" : ""
+                  }`}
+                >
+                  <div className={`${i === 0 ? "aspect-square" : "aspect-square"} bg-muted`}>
+                    <img
+                      src={img.url}
+                      alt={img.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    <span className="text-sm font-display font-semibold text-foreground">{img.title}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          );
+        })()}
       </section>
 
       {/* Testimonials */}

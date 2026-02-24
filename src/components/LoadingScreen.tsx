@@ -30,6 +30,18 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
         exit={{ opacity: 0 }}
         transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
       >
+        {/* Progress bar — top of screen like AP */}
+        <div className="absolute top-0 left-0 w-full">
+          <div className="h-[2px] w-full bg-border overflow-hidden">
+            <motion.div
+              className="h-full bg-primary"
+              initial={{ width: "0%" }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.1, ease: "linear" }}
+            />
+          </div>
+        </div>
+
         {/* Logo reveal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -45,22 +57,10 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="text-xs tracking-[0.4em] uppercase text-muted-foreground mb-10 font-display"
+          className="text-xs tracking-[0.4em] uppercase text-muted-foreground font-display"
         >
           Prague's Premium Nightlife
         </motion.p>
-
-        {/* Progress bar — thin line like AP */}
-        <div className="w-48 md:w-64">
-          <div className="h-[1px] w-full bg-border overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={{ width: "0%" }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.1, ease: "linear" }}
-            />
-          </div>
-        </div>
       </motion.div>
     </AnimatePresence>
   );
