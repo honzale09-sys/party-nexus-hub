@@ -91,6 +91,13 @@
     @apply backdrop-blur-xl;
     background: hsl(var(--background) / 0.85);
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
   /* Smooth reveal animations */
   .reveal-up {
