@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEvents } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Edit2, Trash2, Eye, EyeOff, Copy } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, Copy, Upload, X } from "lucide-react";
 
 export default function AdminEvents() {
   const { data: events = [], isLoading } = useEvents(false);
