@@ -138,6 +138,39 @@ export default function AdminEvents() {
             <input placeholder="Dress code (optional)" value={form.dress_code} onChange={(e) => setForm({ ...form, dress_code: e.target.value })} className="px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
             <input placeholder="Capacity" type="number" value={form.capacity_total} onChange={(e) => setForm({ ...form, capacity_total: parseInt(e.target.value) || 0 })} className="px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
           </div>
+
+          {/* Poster Upload */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">Event Poster</label>
+            <div className="flex items-start gap-4">
+              {posterPreview ? (
+                <div className="relative w-32 aspect-[3/4] rounded-lg overflow-hidden bg-muted border border-border">
+                  <img src={posterPreview} alt="Poster preview" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => { setPosterFile(null); setPosterPreview(null); setForm({ ...form, poster_url: "" }); }}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-background/80 text-destructive hover:bg-background transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-32 aspect-[3/4] rounded-lg border-2 border-dashed border-border hover:border-primary/50 bg-muted/30 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Upload size={20} />
+                  <span className="text-xs">Upload</span>
+                </button>
+              )}
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePosterSelect} className="hidden" />
+              {posterPreview && (
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-primary hover:underline mt-1">Change image</button>
+              )}
+            </div>
+          </div>
+
           <input placeholder="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
           <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm resize-none" />
           <div className="flex items-center gap-6">
