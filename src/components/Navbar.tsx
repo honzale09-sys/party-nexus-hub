@@ -63,7 +63,7 @@ export default function Navbar() {
 
         {/* Desktop right links */}
         <div className="hidden md:flex items-center gap-10 absolute right-4 lg:right-8">
-          {rightLinks.map((l) => (
+          {[...centerRightLinks, ...rightLinks].map((l) => (
             <Link key={l.to} to={l.to} className={linkClass(l.to)}>
               {l.label}
             </Link>
