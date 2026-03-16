@@ -20,8 +20,6 @@ const rightLinks = [
 
 const allLinks = [...leftLinks, ...centerRightLinks, ...rightLinks];
 
-const allLinks = [...leftLinks, ...rightLinks];
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
