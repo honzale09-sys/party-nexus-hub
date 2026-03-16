@@ -6,7 +6,11 @@ import logo from "@/assets/logo.png";
 
 const leftLinks = [
   { label: "Events", to: "/events" },
-  { label: "Gallery", to: "/merch" },
+  { label: "Gallery", to: "/gallery" },
+];
+
+const centerRightLinks = [
+  { label: "Merch", to: "/merch" },
 ];
 
 const rightLinks = [
