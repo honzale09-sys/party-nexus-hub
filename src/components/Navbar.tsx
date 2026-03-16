@@ -18,6 +18,8 @@ const rightLinks = [
   { label: "About Us", to: "/about" },
 ];
 
+const allLinks = [...leftLinks, ...centerRightLinks, ...rightLinks];
+
 const allLinks = [...leftLinks, ...rightLinks];
 
 export default function Navbar() {
