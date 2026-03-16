@@ -10,16 +10,49 @@ export default function AdminEvents() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "",
     category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "",
-    featured: false, status: "draft", capacity_total: 0,
+    featured: false, status: "draft", capacity_total: 0, poster_url: "",
   });
 
   const resetForm = () => {
-    setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0 });
+    setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0, poster_url: "" });
     setEditingId(null);
     setShowForm(false);
+    setPosterFile(null);
+    setPosterPreview(null);
+  };
+
+  const handlePosterSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setPosterFile(file);
+    setPosterPreview(URL.createObjectURL(file));
+  };
+
+  const uploadPoster = async (slug: string): Promise<string | null> => {
+    if (!posterFile) return form.poster_url || null;
+    setUploading(true);
+    try {
+      const ext = posterFile.name.split(".").pop();
+      const path = `${slug}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("event-posters").upload(path, posterFile, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("event-posters").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (err: any) {
+      toast.error("Failed to upload poster: " + err.message);
+      return form.poster_url || null;
+    } finally {
+      setUploading(false);
+    }
   };
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
