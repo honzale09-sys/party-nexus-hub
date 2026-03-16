@@ -1,32 +1,68 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEvents } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Edit2, Trash2, Eye, EyeOff, Copy } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, Copy, Upload, X } from "lucide-react";
 
 export default function AdminEvents() {
   const { data: events = [], isLoading } = useEvents(false);
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "",
     category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "",
-    featured: false, status: "draft", capacity_total: 0,
+    featured: false, status: "draft", capacity_total: 0, poster_url: "",
   });
 
   const resetForm = () => {
-    setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0 });
+    setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0, poster_url: "" });
     setEditingId(null);
     setShowForm(false);
+    setPosterFile(null);
+    setPosterPreview(null);
+  };
+
+  const handlePosterSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setPosterFile(file);
+    setPosterPreview(URL.createObjectURL(file));
+  };
+
+  const uploadPoster = async (slug: string): Promise<string | null> => {
+    if (!posterFile) return form.poster_url || null;
+    setUploading(true);
+    try {
+      const ext = posterFile.name.split(".").pop();
+      const path = `${slug}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("event-posters").upload(path, posterFile, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("event-posters").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (err: any) {
+      toast.error("Failed to upload poster: " + err.message);
+      return form.poster_url || null;
+    } finally {
+      setUploading(false);
+    }
   };
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   const handleSave = async () => {
     try {
-      const payload = { ...form, slug: form.slug || generateSlug(form.title), date: new Date(form.date).toISOString() };
+      const slug = form.slug || generateSlug(form.title);
+      const posterUrl = await uploadPoster(slug);
+      const { poster_url, ...rest } = form;
+      const payload = { ...rest, slug, date: new Date(form.date).toISOString(), poster_url: posterUrl };
       if (editingId) {
         const { error } = await supabase.from("events").update(payload).eq("id", editingId);
         if (error) throw error;
@@ -49,7 +85,10 @@ export default function AdminEvents() {
       venue_address: e.venue_address, category: e.category, age_restriction: e.age_restriction || "18+",
       dress_code: e.dress_code || "", tagline: e.tagline || "", description: e.description || "",
       featured: e.featured, status: e.status, capacity_total: e.capacity_total || 0,
+      poster_url: e.poster_url || "",
     });
+    setPosterPreview(e.poster_url || null);
+    setPosterFile(null);
     setEditingId(e.id);
     setShowForm(true);
   };
@@ -99,6 +138,39 @@ export default function AdminEvents() {
             <input placeholder="Dress code (optional)" value={form.dress_code} onChange={(e) => setForm({ ...form, dress_code: e.target.value })} className="px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
             <input placeholder="Capacity" type="number" value={form.capacity_total} onChange={(e) => setForm({ ...form, capacity_total: parseInt(e.target.value) || 0 })} className="px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
           </div>
+
+          {/* Poster Upload */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">Event Poster</label>
+            <div className="flex items-start gap-4">
+              {posterPreview ? (
+                <div className="relative w-32 aspect-[3/4] rounded-lg overflow-hidden bg-muted border border-border">
+                  <img src={posterPreview} alt="Poster preview" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => { setPosterFile(null); setPosterPreview(null); setForm({ ...form, poster_url: "" }); }}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-background/80 text-destructive hover:bg-background transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-32 aspect-[3/4] rounded-lg border-2 border-dashed border-border hover:border-primary/50 bg-muted/30 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Upload size={20} />
+                  <span className="text-xs">Upload</span>
+                </button>
+              )}
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePosterSelect} className="hidden" />
+              {posterPreview && (
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-primary hover:underline mt-1">Change image</button>
+              )}
+            </div>
+          </div>
+
           <input placeholder="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
           <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm resize-none" />
           <div className="flex items-center gap-6">
@@ -108,7 +180,7 @@ export default function AdminEvents() {
             </select>
           </div>
           <div className="flex gap-3">
-            <button onClick={handleSave} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
+            <button onClick={handleSave} disabled={uploading} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">{uploading ? "Uploading..." : "Save"}</button>
             <button onClick={resetForm} className="px-6 py-2 rounded-lg bg-muted text-foreground text-sm">Cancel</button>
           </div>
         </div>
