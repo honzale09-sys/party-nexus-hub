@@ -16,6 +16,7 @@ import EventDetail from "./pages/EventDetail";
 import Tickets from "./pages/Tickets";
 import Merch from "./pages/Merch";
 import Gallery from "./pages/Gallery";
+import ProductDetail from "./pages/ProductDetail";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import Terms from "./pages/Terms";
