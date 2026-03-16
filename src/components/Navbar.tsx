@@ -6,7 +6,11 @@ import logo from "@/assets/logo.png";
 
 const leftLinks = [
   { label: "Events", to: "/events" },
-  { label: "Gallery", to: "/merch" },
+  { label: "Gallery", to: "/gallery" },
+];
+
+const centerRightLinks = [
+  { label: "Merch", to: "/merch" },
 ];
 
 const rightLinks = [
@@ -14,7 +18,7 @@ const rightLinks = [
   { label: "About Us", to: "/about" },
 ];
 
-const allLinks = [...leftLinks, ...rightLinks];
+const allLinks = [...leftLinks, ...centerRightLinks, ...rightLinks];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -59,7 +63,7 @@ export default function Navbar() {
 
         {/* Desktop right links */}
         <div className="hidden md:flex items-center gap-10 absolute right-4 lg:right-8">
-          {rightLinks.map((l) => (
+          {[...centerRightLinks, ...rightLinks].map((l) => (
             <Link key={l.to} to={l.to} className={linkClass(l.to)}>
               {l.label}
             </Link>

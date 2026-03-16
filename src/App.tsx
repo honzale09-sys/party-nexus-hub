@@ -15,6 +15,7 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import Tickets from "./pages/Tickets";
 import Merch from "./pages/Merch";
+import Gallery from "./pages/Gallery";
 import ProductDetail from "./pages/ProductDetail";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
@@ -62,6 +63,7 @@ const App = () => {
                   <Route path="/events" element={<Events />} />
                   <Route path="/events/:slug" element={<EventDetail />} />
                   <Route path="/tickets" element={<Tickets />} />
+                  <Route path="/gallery" element={<Gallery />} />
                   <Route path="/merch" element={<Merch />} />
                   <Route path="/merch/:slug" element={<ProductDetail />} />
                   <Route path="/contact" element={<Contact />} />
