@@ -59,7 +59,10 @@ export default function AdminEvents() {
 
   const handleSave = async () => {
     try {
-      const payload = { ...form, slug: form.slug || generateSlug(form.title), date: new Date(form.date).toISOString() };
+      const slug = form.slug || generateSlug(form.title);
+      const posterUrl = await uploadPoster(slug);
+      const { poster_url, ...rest } = form;
+      const payload = { ...rest, slug, date: new Date(form.date).toISOString(), poster_url: posterUrl };
       if (editingId) {
         const { error } = await supabase.from("events").update(payload).eq("id", editingId);
         if (error) throw error;
@@ -82,7 +85,10 @@ export default function AdminEvents() {
       venue_address: e.venue_address, category: e.category, age_restriction: e.age_restriction || "18+",
       dress_code: e.dress_code || "", tagline: e.tagline || "", description: e.description || "",
       featured: e.featured, status: e.status, capacity_total: e.capacity_total || 0,
+      poster_url: e.poster_url || "",
     });
+    setPosterPreview(e.poster_url || null);
+    setPosterFile(null);
     setEditingId(e.id);
     setShowForm(true);
   };
