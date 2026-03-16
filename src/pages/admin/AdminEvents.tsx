@@ -180,7 +180,7 @@ export default function AdminEvents() {
             </select>
           </div>
           <div className="flex gap-3">
-            <button onClick={handleSave} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
+            <button onClick={handleSave} disabled={uploading} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">{uploading ? "Uploading..." : "Save"}</button>
             <button onClick={resetForm} className="px-6 py-2 rounded-lg bg-muted text-foreground text-sm">Cancel</button>
           </div>
         </div>
