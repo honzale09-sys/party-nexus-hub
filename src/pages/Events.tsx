@@ -22,11 +22,11 @@ export default function Events() {
           <div className="text-center py-20 text-muted-foreground">Loading events...</div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-            {filtered.map((e: any) => <EventCard key={e.id} event={e} />)}
+            {sorted.map((e: any) => <EventCard key={e.id} event={e} />)}
           </div>
         )}
-        {!isLoading && filtered.length === 0 && (
-          <p className="text-center text-muted-foreground py-20">No events found in this category.</p>
+        {!isLoading && sorted.length === 0 && (
+          <p className="text-center text-muted-foreground py-20">No events found.</p>
         )}
       </section>
     </div>
