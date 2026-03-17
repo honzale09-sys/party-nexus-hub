@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useEvents } from "@/hooks/useData";
 import EventCard from "@/components/EventCard";
