@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/useData";
+import ScrollReveal from "@/components/ScrollReveal";
+import { staggerContainer, fadeUp, smoothTransition } from "@/hooks/useScrollReveal";
 
 const cats = ["all", "tees", "hoodies", "accessories"] as const;
 
@@ -17,30 +19,55 @@ export default function Merch() {
   return (
     <div className="pt-20">
       <section className="container mx-auto px-4 py-20">
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-display text-4xl md:text-6xl font-bold text-center">
-          Official <span className="text-gradient">Merch</span>
-        </motion.h1>
-        <p className="text-center text-muted-foreground mt-3">Wear the night. Rep the party.</p>
+        <ScrollReveal>
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-center">
+            Official <span className="text-gradient">Merch</span>
+          </h1>
+        </ScrollReveal>
+        <ScrollReveal delay={0.1}>
+          <p className="text-center text-muted-foreground mt-3">Wear the night. Rep the party.</p>
+        </ScrollReveal>
 
-        <div className="flex items-center justify-center gap-3 mt-10">
-          {cats.map((c) => (
-            <button key={c} onClick={() => setCategory(c)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${category === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}>
-              {c === "all" ? "All" : c.charAt(0).toUpperCase() + c.slice(1)}
-            </button>
-          ))}
-        </div>
+        <ScrollReveal delay={0.2}>
+          <div className="flex items-center justify-center gap-3 mt-10">
+            {cats.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 active:scale-[0.97] ${
+                  category === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {c === "all" ? "All" : c.charAt(0).toUpperCase() + c.slice(1)}
+              </button>
+            ))}
+          </div>
+        </ScrollReveal>
 
         {isLoading ? (
           <div className="text-center py-20 text-muted-foreground">Loading products...</div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={staggerContainer}
+          >
             {filtered.map((p: any) => {
               const totalStock = p.product_variants?.reduce((s: number, v: any) => s + v.stock, 0) || 0;
               return (
-                <motion.div key={p.id} whileHover={{ y: -4 }} className="rounded-xl bg-card neon-border neon-border-hover transition-all overflow-hidden">
+                <motion.div
+                  key={p.id}
+                  variants={fadeUp}
+                  transition={smoothTransition}
+                  className="rounded-xl bg-card neon-border neon-border-hover transition-all overflow-hidden group"
+                >
                   <Link to={`/merch/${p.slug}`}>
-                    <div className="aspect-square bg-muted flex items-center justify-center text-5xl text-muted-foreground">
-                      {p.category === "tees" ? "👕" : p.category === "hoodies" ? "🧥" : "🧢"}
+                    <div className="aspect-square bg-muted flex items-center justify-center text-5xl text-muted-foreground overflow-hidden">
+                      <span className="transition-transform duration-500 group-hover:scale-110">
+                        {p.category === "tees" ? "👕" : p.category === "hoodies" ? "🧥" : "🧢"}
+                      </span>
                     </div>
                     <div className="p-5">
                       <h3 className="font-display font-semibold">{p.name}</h3>
@@ -54,7 +81,7 @@ export default function Merch() {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </section>
     </div>

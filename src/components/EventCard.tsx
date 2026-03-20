@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Calendar, MapPin } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface EventCardProps {
   event: {
@@ -22,17 +21,15 @@ export default function EventCard({ event }: EventCardProps) {
     : null;
 
   return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      className="group rounded-xl overflow-hidden bg-card neon-border neon-border-hover transition-all duration-300"
-    >
+    <div className="group rounded-xl overflow-hidden bg-card neon-border neon-border-hover transition-all duration-300 hover:-translate-y-1">
       <Link to={`/events/${event.slug}`}>
         <div className="aspect-square overflow-hidden bg-muted">
           {event.poster_url ? (
             <img
               src={event.poster_url}
               alt={event.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl text-muted-foreground">🎵</div>
@@ -66,6 +63,6 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
