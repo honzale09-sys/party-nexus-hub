@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
-import heroBg from "@/assets/hero-bg.jpg";
 import { useEvents } from "@/hooks/useData";
 import HeroEventCard from "@/components/HeroEventCard";
-import ScrollReveal from "@/components/ScrollReveal";
 import { staggerContainer, fadeUp, smoothTransition } from "@/hooks/useScrollReveal";
 
 export default function Index() {
@@ -10,15 +8,15 @@ export default function Index() {
 
   return (
     <div>
-      {/* Full-bleed hero */}
+      {/* Full-bleed hero with looping video */}
       <section className="relative h-screen w-full overflow-hidden">
-        <motion.img
-          src={heroBg}
-          alt=""
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          src="/videos/hero-loop.mp4"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
       </section>
