@@ -9,13 +9,13 @@ export default function Index() {
   return (
     <div>
       {/* Full-bleed hero with looping video */}
-      <section className="relative h-screen w-full overflow-hidden">
+      <section className="relative h-[75vh] md:h-screen w-full overflow-hidden">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
           src="/videos/hero-loop.mp4"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
