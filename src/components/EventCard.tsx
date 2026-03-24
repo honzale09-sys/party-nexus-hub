@@ -70,15 +70,15 @@ export default function EventCard({ event }: EventCardProps) {
         <h3 className="font-display text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
           {event.title}
         </h3>
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Calendar size={14} className="text-destructive shrink-0" />
+        <div className="flex items-center gap-1.5 text-sm text-foreground/80">
+          <Calendar size={14} className="text-primary shrink-0" />
           <span>{formattedDate}{displayTime ? ` ${displayTime}` : ""}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin size={14} className="text-destructive shrink-0" />
+        <div className="flex items-center gap-1.5 text-sm text-foreground/80">
+          <MapPin size={14} className="text-primary shrink-0" />
           <span>{event.venue_name}</span>
         </div>
-        <p className="text-xs text-muted-foreground">{event.venue_address}</p>
+        <p className="text-xs text-foreground/60">{event.venue_address}</p>
       </div>
     </Link>
   );
