@@ -56,9 +56,7 @@ export default function Navbar() {
 
         {/* Center logo */}
         <Link to="/" className="flex items-center">
-          <div className="border border-border p-2">
-            <img src={logo} alt="ONE BIG PARTY" className="h-10 w-auto" />
-          </div>
+          <img src={logo} alt="ONE BIG PARTY" className="h-14 md:h-16 w-auto" />
         </Link>
 
         {/* Desktop right links */}
