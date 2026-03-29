@@ -23,7 +23,7 @@ export default function Index() {
       </section>
 
       {/* Horizontal scrolling event cards */}
-      <section className="relative -mt-48 z-10 pb-20">
+      <section className="relative -mt-32 md:-mt-48 z-10 pb-20">
         <motion.div
           className="overflow-x-auto scrollbar-hide"
           initial="hidden"
@@ -31,7 +31,7 @@ export default function Index() {
           viewport={{ once: true, amount: 0.2 }}
           variants={staggerContainer}
         >
-          <div className="flex gap-4 px-4 md:px-8 min-w-max">
+          <div className="flex gap-3 md:gap-4 px-4 md:px-8 min-w-max">
             {events.length > 0
               ? events.map((e: any, i: number) => (
                   <motion.div
