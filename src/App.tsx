@@ -73,6 +73,8 @@ const App = () => {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/payment-cancelled" element={<PaymentCancelled />} />
                 </Route>
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
