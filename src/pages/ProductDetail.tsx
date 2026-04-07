@@ -1,13 +1,16 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
-import { ArrowLeft, Minus, Plus, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Loader2 } from "lucide-react";
 import { useProduct } from "@/hooks/useData";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const { data: product, isLoading } = useProduct(slug || "");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [qty, setQty] = useState(1);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   if (isLoading) return <div className="pt-20 min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
 
@@ -21,6 +24,49 @@ export default function ProductDetail() {
   const sizes = [...new Set(product.product_variants?.map((v: any) => v.size).filter(Boolean))];
   const selectedVariant = product.product_variants?.find((v: any) => v.size === selectedSize);
   const inStock = selectedVariant ? selectedVariant.stock > 0 : product.product_variants?.some((v: any) => v.stock > 0);
+
+  const handleBuy = async () => {
+    // Determine variant to buy
+    let variantId: string | undefined;
+    if (sizes.length > 0) {
+      variantId = selectedVariant?.id;
+    } else {
+      variantId = product.product_variants?.[0]?.id;
+    }
+
+    if (!variantId) {
+      toast.error("Please select a variant");
+      return;
+    }
+
+    setCheckoutLoading(true);
+    try {
+      const email = prompt("Enter your email to proceed to checkout:");
+      if (!email) {
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          items: [{ type: "product", product_variant_id: variantId, quantity: qty }],
+          customer_email: email.trim(),
+          origin: window.location.origin,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      toast.error(err.message || "Checkout failed");
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div className="pt-20">
@@ -64,9 +110,8 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <button disabled={!inStock || (sizes.length > 0 && !selectedSize)} className="mt-8 w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-purple hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
-              <ShoppingBag size={18} />
-              {inStock ? "Add to Cart" : "Sold Out"}
+            <button onClick={handleBuy} disabled={!inStock || (sizes.length > 0 && !selectedSize) || checkoutLoading} className="mt-8 w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold transition-all hover:glow-purple hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
+              {checkoutLoading ? <><Loader2 className="animate-spin" size={18} /> Redirecting...</> : <><ShoppingBag size={18} /> {inStock ? "Buy Now" : "Sold Out"}</>}
             </button>
             {sizes.length > 0 && !selectedSize && inStock && <p className="text-xs text-muted-foreground mt-2">Please select a size</p>}
 
