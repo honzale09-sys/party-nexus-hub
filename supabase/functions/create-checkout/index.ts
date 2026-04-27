@@ -21,7 +21,7 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    const { items, customer_email, customer_name, origin } = await req.json();
+    const { items, customer_email, customer_name, origin, promo_code } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ error: "items array is required" }), {
@@ -40,6 +40,10 @@ serve(async (req) => {
       customer_email,
       customer_name: customer_name || "",
     };
+
+    let subtotal = 0; // in CZK (or item currency, assumed uniform)
+    let hasTickets = false;
+    let hasProducts = false;
 
     // Process each item
     for (let i = 0; i < items.length; i++) {
@@ -84,6 +88,8 @@ serve(async (req) => {
         metadata[`item_${i}_quantity`] = String(item.quantity);
         metadata[`item_${i}_unit_price`] = String(tier.price);
         metadata[`item_${i}_event_id`] = tier.event_id;
+        subtotal += tier.price * item.quantity;
+        hasTickets = true;
 
       } else if (item.type === "product") {
         // Look up product variant
@@ -124,7 +130,81 @@ serve(async (req) => {
         metadata[`item_${i}_product_variant_id`] = item.product_variant_id;
         metadata[`item_${i}_quantity`] = String(item.quantity);
         metadata[`item_${i}_unit_price`] = String(product.price);
+        subtotal += product.price * item.quantity;
+        hasProducts = true;
       }
+    }
+
+    // Process promo code if provided
+    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+    if (promo_code && typeof promo_code === "string" && promo_code.trim()) {
+      const codeUpper = promo_code.trim().toUpperCase();
+      const { data: promo, error: promoErr } = await supabase
+        .from("promo_codes")
+        .select("*")
+        .ilike("code", codeUpper)
+        .eq("active", true)
+        .maybeSingle();
+
+      if (promoErr || !promo) {
+        return new Response(JSON.stringify({ error: `Invalid promo code: ${codeUpper}` }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const now = new Date();
+      if (promo.valid_from && new Date(promo.valid_from) > now) {
+        return new Response(JSON.stringify({ error: "Promo code is not yet active" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (promo.valid_until && new Date(promo.valid_until) < now) {
+        return new Response(JSON.stringify({ error: "Promo code has expired" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (promo.usage_limit && promo.usage_count >= promo.usage_limit) {
+        return new Response(JSON.stringify({ error: "Promo code usage limit reached" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (promo.minimum_spend && subtotal < promo.minimum_spend) {
+        return new Response(JSON.stringify({ error: `Minimum spend of ${promo.minimum_spend} CZK required` }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Check applies_to
+      if (promo.applies_to === "tickets" && !hasTickets) {
+        return new Response(JSON.stringify({ error: "This code only applies to tickets" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (promo.applies_to === "merch" && !hasProducts) {
+        return new Response(JSON.stringify({ error: "This code only applies to merch" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Create a single-use Stripe coupon to apply at checkout
+      const couponParams: Stripe.CouponCreateParams = {
+        name: `Promo: ${promo.code}`,
+        duration: "once",
+        metadata: { promo_code_id: promo.id, code: promo.code },
+      };
+      if (promo.discount_type === "percentage") {
+        couponParams.percent_off = promo.discount_value;
+      } else {
+        couponParams.amount_off = promo.discount_value * 100; // CZK -> hellers
+        couponParams.currency = "czk";
+      }
+
+      const coupon = await stripe.coupons.create(couponParams);
+      discounts = [{ coupon: coupon.id }];
+
+      metadata.promo_code_id = promo.id;
+      metadata.promo_code = promo.code;
+      metadata.promo_discount_type = promo.discount_type;
+      metadata.promo_discount_value = String(promo.discount_value);
     }
 
     // Create Stripe Checkout Session
@@ -135,6 +215,7 @@ serve(async (req) => {
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/payment-cancelled`,
       metadata,
+      ...(discounts ? { discounts } : { allow_promotion_codes: false }),
     });
 
     return new Response(JSON.stringify({ url: session.url, session_id: session.id }), {

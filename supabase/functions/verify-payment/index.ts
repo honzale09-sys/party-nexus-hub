@@ -96,11 +96,30 @@ serve(async (req) => {
         fulfillment_status: "confirmed",
         stripe_session_id: session_id,
         stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : null,
+        promo_code_id: meta.promo_code_id || null,
+        discount_amount: session.total_details?.amount_discount
+          ? Math.round((session.total_details.amount_discount as number) / 100)
+          : 0,
       })
       .select()
       .single();
 
     if (orderError) throw orderError;
+
+    // Increment promo usage_count
+    if (meta.promo_code_id) {
+      const { data: promo } = await supabase
+        .from("promo_codes")
+        .select("usage_count")
+        .eq("id", meta.promo_code_id)
+        .single();
+      if (promo) {
+        await supabase
+          .from("promo_codes")
+          .update({ usage_count: promo.usage_count + 1 })
+          .eq("id", meta.promo_code_id);
+      }
+    }
 
     // Insert order items
     for (const item of orderItems) {

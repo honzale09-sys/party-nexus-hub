@@ -21,6 +21,7 @@ export default function TicketCheckoutDialog({ open, onOpenChange, tier, eventTi
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [qty, setQty] = useState(1);
+  const [promoCode, setPromoCode] = useState("");
   const [loading, setLoading] = useState(false);
 
   const total = tier.price * qty;
@@ -38,11 +39,14 @@ export default function TicketCheckoutDialog({ open, onOpenChange, tier, eventTi
           items: [{ type: "ticket", ticket_tier_id: tier.id, quantity: qty }],
           customer_email: email.trim(),
           customer_name: name.trim() || undefined,
+          promo_code: promoCode.trim() || undefined,
           origin: window.location.origin,
         },
       });
 
+      // Edge function returns 400 with error in data when promo invalid
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       if (data?.url) {
         window.open(data.url, "_blank");
         setLoading(false);
@@ -63,6 +67,7 @@ export default function TicketCheckoutDialog({ open, onOpenChange, tier, eventTi
       setName("");
       setEmail("");
       setQty(1);
+      setPromoCode("");
     }, 300);
   };
 
@@ -99,6 +104,17 @@ export default function TicketCheckoutDialog({ open, onOpenChange, tier, eventTi
           <div className="flex items-center justify-between pt-2 border-t border-border">
             <span className="text-sm text-muted-foreground">Total</span>
             <span className="font-display font-bold text-lg">{total} {tier.currency}</span>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Promo code (optional)</label>
+            <input
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+              placeholder="e.g. WELCOME10"
+              className="mt-1 w-full px-3 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm placeholder:text-muted-foreground uppercase"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Discount will be applied at payment.</p>
           </div>
 
           <button onClick={handleCheckout} disabled={loading} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:glow-purple hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
