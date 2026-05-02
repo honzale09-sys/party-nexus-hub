@@ -1,18 +1,50 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useProducts } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Upload, X } from "lucide-react";
 
 export default function AdminProducts() {
   const { data: products = [], isLoading } = useProducts(false);
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", slug: "", description: "", category: "tees", price: 0, featured: false, active: true, sku: "" });
+  const [form, setForm] = useState({ name: "", slug: "", description: "", category: "tees", price: 0, featured: false, active: true, sku: "", images: [] as string[] });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const genSlug = (n: string) => n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) { toast.error(`${file.name} is not an image`); continue; }
+        if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} exceeds 5MB`); continue; }
+        const ext = file.name.split(".").pop();
+        const path = `${(form.slug || genSlug(form.name) || "product")}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(path, file, { upsert: false });
+        if (error) throw error;
+        const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
+      toast.success(`Uploaded ${uploaded.length} image(s)`);
+    } catch (err: any) {
+      toast.error("Upload failed: " + err.message);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setForm((f) => ({ ...f, images: f.images.filter((u) => u !== url) }));
+  };
 
   const handleSave = async () => {
     try {
@@ -32,7 +64,7 @@ export default function AdminProducts() {
   };
 
   const handleEdit = (p: any) => {
-    setForm({ name: p.name, slug: p.slug, description: p.description || "", category: p.category, price: p.price, featured: p.featured, active: p.active, sku: p.sku || "" });
+    setForm({ name: p.name, slug: p.slug, description: p.description || "", category: p.category, price: p.price, featured: p.featured, active: p.active, sku: p.sku || "", images: p.images || [] });
     setEditingId(p.id); setShowForm(true);
   };
 
@@ -47,7 +79,7 @@ export default function AdminProducts() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl font-bold">Products</h1>
-        <button onClick={() => { setForm({ name: "", slug: "", description: "", category: "tees", price: 0, featured: false, active: true, sku: "" }); setEditingId(null); setShowForm(true); }} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2"><Plus size={16} /> Add Product</button>
+        <button onClick={() => { setForm({ name: "", slug: "", description: "", category: "tees", price: 0, featured: false, active: true, sku: "", images: [] }); setEditingId(null); setShowForm(true); }} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2"><Plus size={16} /> Add Product</button>
       </div>
 
       {showForm && (
@@ -62,6 +94,37 @@ export default function AdminProducts() {
             <input type="number" placeholder="Price (CZK)" value={form.price} onChange={(e) => setForm({ ...form, price: parseInt(e.target.value) || 0 })} className="px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm" />
           </div>
           <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground text-sm resize-none" />
+
+          {/* Product images */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">Product Images</label>
+            <div className="flex items-start gap-3 flex-wrap">
+              {form.images.map((url) => (
+                <div key={url} className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+                  <img src={url} alt="Product" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(url)}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-background/80 text-destructive hover:bg-background transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-24 h-24 rounded-lg border-2 border-dashed border-border hover:border-primary/50 bg-muted/30 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+              >
+                <Upload size={16} />
+                <span className="text-[10px]">{uploading ? "Uploading..." : "Add"}</span>
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">First image will be used as the main thumbnail. Max 5MB each.</p>
+          </div>
+
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Active</label>
