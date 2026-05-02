@@ -11,6 +11,7 @@ export default function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [qty, setQty] = useState(1);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   if (isLoading) return <div className="pt-20 min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
 
@@ -42,8 +43,29 @@ export default function ProductDetail() {
           <ArrowLeft size={14} /> Back to merch
         </Link>
         <div className="grid md:grid-cols-2 gap-10">
-          <div className="aspect-square rounded-xl bg-muted flex items-center justify-center text-8xl text-muted-foreground">
-            {product.category === "tees" ? "👕" : product.category === "hoodies" ? "🧥" : "🧢"}
+          <div>
+            <div className="aspect-square rounded-xl bg-muted overflow-hidden flex items-center justify-center">
+              {product.images && product.images.length > 0 ? (
+                <img src={product.images[activeImage] || product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-8xl text-muted-foreground">
+                  {product.category === "tees" ? "👕" : product.category === "hoodies" ? "🧥" : "🧢"}
+                </span>
+              )}
+            </div>
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto">
+                {product.images.map((url: string, i: number) => (
+                  <button
+                    key={url}
+                    onClick={() => setActiveImage(i)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${i === activeImage ? "border-primary" : "border-transparent"}`}
+                  >
+                    <img src={url} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <span className="text-xs uppercase tracking-widest text-primary">{product.category}</span>

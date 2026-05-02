@@ -10,7 +10,7 @@ export default function Gallery() {
   const [selectedEvent, setSelectedEvent] = useState<string>("all");
 
   const eventsWithMedia = useMemo(
-    () => events.filter((e: any) => e.poster_url || (e.gallery_urls && e.gallery_urls.length > 0)),
+    () => events.filter((e: any) => e.gallery_urls && e.gallery_urls.length > 0),
     [events]
   );
 
@@ -18,7 +18,6 @@ export default function Gallery() {
     const imgs: { url: string; eventTitle: string; eventId: string }[] = [];
     const source = selectedEvent === "all" ? eventsWithMedia : eventsWithMedia.filter((e: any) => e.id === selectedEvent);
     source.forEach((e: any) => {
-      if (e.poster_url) imgs.push({ url: e.poster_url, eventTitle: e.title, eventId: e.id });
       if (e.gallery_urls) {
         e.gallery_urls.forEach((url: string) => imgs.push({ url, eventTitle: e.title, eventId: e.id }));
       }

@@ -42,7 +42,7 @@ export default function Contact() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail size={18} className="text-primary" />
-                  <span className="text-sm">hello@onebigparty.cz</span>
+                  <span className="text-sm">info@onebigparty.net</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock size={18} className="text-primary" />

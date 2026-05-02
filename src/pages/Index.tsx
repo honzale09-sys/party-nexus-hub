@@ -24,11 +24,15 @@ export default function Index() {
 
       {/* Horizontal scrolling event cards */}
       <section className="relative -mt-32 md:-mt-48 z-10 pb-20">
+        <div className="px-4 md:px-8 mb-6">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+            Upcoming <span className="text-gradient">Events</span>
+          </h2>
+        </div>
         <motion.div
           className="overflow-x-auto scrollbar-hide"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          animate="visible"
           variants={staggerContainer}
         >
           <div className="flex gap-3 md:gap-4 px-4 md:px-8 min-w-max">

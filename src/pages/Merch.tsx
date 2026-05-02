@@ -64,10 +64,19 @@ export default function Merch() {
                   className="rounded-xl bg-card neon-border neon-border-hover transition-all overflow-hidden group"
                 >
                   <Link to={`/merch/${p.slug}`}>
-                    <div className="aspect-square bg-muted flex items-center justify-center text-5xl text-muted-foreground overflow-hidden">
-                      <span className="transition-transform duration-500 group-hover:scale-110">
-                        {p.category === "tees" ? "👕" : p.category === "hoodies" ? "🧥" : "🧢"}
-                      </span>
+                    <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
+                      {p.images && p.images.length > 0 ? (
+                        <img
+                          src={p.images[0]}
+                          alt={p.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="text-5xl text-muted-foreground transition-transform duration-500 group-hover:scale-110">
+                          {p.category === "tees" ? "👕" : p.category === "hoodies" ? "🧥" : "🧢"}
+                        </span>
+                      )}
                     </div>
                     <div className="p-5">
                       <h3 className="font-display font-semibold">{p.name}</h3>
