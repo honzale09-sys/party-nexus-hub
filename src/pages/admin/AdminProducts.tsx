@@ -22,19 +22,33 @@ export default function AdminProducts() {
     setUploading(true);
     try {
       const uploaded: string[] = [];
+      const skipped: string[] = [];
       for (const file of files) {
-        if (!file.type.startsWith("image/")) { toast.error(`${file.name} is not an image`); continue; }
-        if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} exceeds 5MB`); continue; }
-        const ext = file.name.split(".").pop();
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const imageExts = ["jpg","jpeg","png","webp","gif","heic","heif","avif","bmp"];
+        const isImage = file.type.startsWith("image/") || imageExts.includes(ext);
+        if (!isImage) { toast.error(`${file.name} is not an image`); skipped.push(file.name); continue; }
+        if (file.size > 10 * 1024 * 1024) { toast.error(`${file.name} exceeds 10MB`); skipped.push(file.name); continue; }
         const path = `${(form.slug || genSlug(form.name) || "product")}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-        const { error } = await supabase.storage.from("product-images").upload(path, file, { upsert: false });
-        if (error) throw error;
+        const contentType = file.type || `image/${ext === "jpg" ? "jpeg" : ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(path, file, { upsert: false, contentType });
+        if (error) {
+          console.error("Upload error for", file.name, error);
+          toast.error(`${file.name}: ${error.message}`);
+          skipped.push(file.name);
+          continue;
+        }
         const { data } = supabase.storage.from("product-images").getPublicUrl(path);
         uploaded.push(data.publicUrl);
       }
-      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
-      toast.success(`Uploaded ${uploaded.length} image(s)`);
+      if (uploaded.length > 0) {
+        setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
+        toast.success(`Uploaded ${uploaded.length} image(s)`);
+      } else if (skipped.length > 0) {
+        toast.error(`No files uploaded. Check file type/size.`);
+      }
     } catch (err: any) {
+      console.error("Image upload failed:", err);
       toast.error("Upload failed: " + err.message);
     } finally {
       setUploading(false);
