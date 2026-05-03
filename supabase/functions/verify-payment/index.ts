@@ -202,6 +202,17 @@ serve(async (req) => {
       }
     }
 
+    // Send ticket email with PDF attachments (only after Stripe-confirmed payment)
+    if (tickets.length > 0) {
+      try {
+        await supabase.functions.invoke("send-ticket-email", {
+          body: { order_id: order.id },
+        });
+      } catch (e) {
+        console.error("send-ticket-email failed:", e);
+      }
+    }
+
     // For product items, decrement stock
     for (const item of orderItems) {
       if (item.item_type !== "product" || !item.product_variant_id) continue;
