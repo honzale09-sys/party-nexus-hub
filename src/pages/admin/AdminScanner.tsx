@@ -1,8 +1,9 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Camera, Search, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Html5Qrcode } from "html5-qrcode";
 
 type ScanResult = { status: "valid" | "already_used" | "invalid" | "idle"; message: string; event?: string };
 
@@ -11,8 +12,8 @@ export default function AdminScanner() {
   const [result, setResult] = useState<ScanResult>({ status: "idle", message: "" });
   const [manualId, setManualId] = useState("");
   const [scanning, setScanning] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const containerId = "qr-reader";
 
   const validateTicket = useCallback(async (qrCode: string) => {
     try {
@@ -47,20 +48,43 @@ export default function AdminScanner() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      streamRef.current = stream;
-      if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play(); }
       setScanning(true);
-      toast.info("Camera active. QR scanning requires a library integration — use manual lookup for now.");
-    } catch {
-      toast.error("Camera access denied");
+      // Wait a tick for the container to render
+      await new Promise((r) => setTimeout(r, 50));
+      const scanner = new Html5Qrcode(containerId);
+      scannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          validateTicket(decodedText);
+          stopCamera();
+        },
+        () => {}
+      );
+    } catch (err: any) {
+      console.error("Camera error:", err);
+      toast.error("Camera access denied or unavailable");
+      setScanning(false);
     }
   };
 
-  const stopCamera = () => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+  const stopCamera = async () => {
+    try {
+      if (scannerRef.current) {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+        scannerRef.current = null;
+      }
+    } catch (e) {
+      console.warn("Stop camera error:", e);
+    }
     setScanning(false);
   };
+
+  useEffect(() => {
+    return () => { if (scannerRef.current) { scannerRef.current.stop().catch(() => {}); } };
+  }, []);
 
   const handleManualLookup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,11 +98,8 @@ export default function AdminScanner() {
       {/* Camera */}
       <div className="rounded-xl bg-card neon-border overflow-hidden mb-6">
         <div className="aspect-video bg-muted relative flex items-center justify-center">
-          {scanning ? (
-            <video ref={videoRef} className="w-full h-full object-cover" />
-          ) : (
-            <Camera size={48} className="text-muted-foreground" />
-          )}
+          <div id={containerId} className="w-full h-full" />
+          {!scanning && <Camera size={48} className="text-muted-foreground absolute" />}
         </div>
         <div className="p-4 flex justify-center">
           <button onClick={scanning ? stopCamera : startCamera} className={`px-6 py-2 rounded-lg text-sm font-semibold ${scanning ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"}`}>

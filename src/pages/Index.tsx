@@ -8,18 +8,13 @@ export default function Index() {
 
   return (
     <div>
-      {/* Full-bleed hero with looping video */}
-      <section className="relative h-[85vh] md:h-screen w-full overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="/videos/hero-poster.jpg"
-          className="absolute inset-0 w-full h-full object-cover object-[center_30%] md:object-center"
-          src="/videos/hero-loop.mp4"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/30 to-background" />
+      {/* Hero placeholder — video coming soon */}
+      <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden bg-gradient-to-br from-background via-card to-background flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="font-display text-5xl md:text-7xl font-bold text-gradient mb-4">ONE BIG PARTY</h1>
+          <p className="text-muted-foreground text-lg">Prague's premier nightlife experience</p>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background pointer-events-none" />
       </section>
 
       {/* Horizontal scrolling event cards */}
