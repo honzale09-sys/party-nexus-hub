@@ -237,6 +237,59 @@ export default function AdminEvents() {
               <option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option>
             </select>
           </div>
+
+          {/* Ticket Tiers */}
+          <div className="space-y-3">
+            <h3 className="font-display font-semibold text-base">Ticket Pricing</h3>
+            <p className="text-xs text-muted-foreground">Toggle each tier on/off. Price is in CZK (cents — e.g. 39000 = 390 Kč).</p>
+            <div className="space-y-2">
+              {tiers.map((t, idx) => (
+                <div key={t.name} className="grid grid-cols-12 gap-2 items-center rounded-lg border border-border bg-background/50 p-3">
+                  <label className="col-span-12 sm:col-span-4 flex items-center gap-2 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, enabled: e.target.checked };
+                        setTiers(next);
+                      }}
+                    />
+                    {t.name}
+                  </label>
+                  <div className="col-span-6 sm:col-span-4">
+                    <label className="text-xs text-muted-foreground">Price (CZK cents)</label>
+                    <input
+                      type="number"
+                      value={t.price}
+                      disabled={!t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, price: parseInt(e.target.value) || 0 };
+                        setTiers(next);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="col-span-6 sm:col-span-4">
+                    <label className="text-xs text-muted-foreground">Quantity</label>
+                    <input
+                      type="number"
+                      value={t.quantity_total}
+                      disabled={!t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, quantity_total: parseInt(e.target.value) || 0 };
+                        setTiers(next);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="flex gap-3">
             <button onClick={handleSave} disabled={uploading} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">{uploading ? "Uploading..." : "Save"}</button>
             <button onClick={resetForm} className="px-6 py-2 rounded-lg bg-muted text-foreground text-sm">Cancel</button>
