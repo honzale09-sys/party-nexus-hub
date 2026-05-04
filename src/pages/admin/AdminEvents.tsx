@@ -82,15 +82,37 @@ export default function AdminEvents() {
       const posterUrl = await uploadPoster(slug);
       const { poster_url, ...rest } = form;
       const payload = { ...rest, slug, date: new Date(form.date).toISOString(), poster_url: posterUrl };
+      let eventId = editingId;
       if (editingId) {
         const { error } = await supabase.from("events").update(payload).eq("id", editingId);
         if (error) throw error;
         toast.success("Event updated!");
       } else {
-        const { error } = await supabase.from("events").insert(payload);
+        const { data: inserted, error } = await supabase.from("events").insert(payload).select("id").single();
         if (error) throw error;
+        eventId = inserted.id;
         toast.success("Event created!");
       }
+
+      // Sync ticket tiers
+      if (eventId) {
+        for (const t of tiers) {
+          const tierPayload = {
+            event_id: eventId,
+            name: t.name,
+            price: t.price,
+            currency: "CZK",
+            visible: t.enabled,
+            quantity_total: t.quantity_total || 0,
+          };
+          if (t.id) {
+            await supabase.from("ticket_tiers").update(tierPayload).eq("id", t.id);
+          } else if (t.enabled) {
+            await supabase.from("ticket_tiers").insert(tierPayload);
+          }
+        }
+      }
+
       queryClient.invalidateQueries({ queryKey: ["events"] });
       resetForm();
     } catch (err: any) {
@@ -110,6 +132,23 @@ export default function AdminEvents() {
     setPosterFile(null);
     setEditingId(e.id);
     setShowForm(true);
+    // Hydrate tier state from existing tiers + presets
+    const existing: any[] = e.ticket_tiers || [];
+    setTiers(
+      PRESET_TIERS.map((preset) => {
+        const match = existing.find((x) => x.name === preset.name);
+        if (match) {
+          return {
+            id: match.id,
+            name: match.name,
+            price: match.price,
+            enabled: match.visible,
+            quantity_total: match.quantity_total || 0,
+          };
+        }
+        return { ...preset, enabled: false, quantity_total: 0 };
+      })
+    );
   };
 
   const handleDelete = async (id: string) => {
