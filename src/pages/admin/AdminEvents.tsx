@@ -5,6 +5,21 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Copy, Upload, X } from "lucide-react";
 
+const PRESET_TIERS = [
+  { name: "Early Bird", price: 39000 },
+  { name: "First Wave", price: 49000 },
+  { name: "VIP Admission", price: 99000 },
+  { name: "Group Admission", price: 35000 },
+];
+
+type TierState = {
+  name: string;
+  price: number;
+  enabled: boolean;
+  quantity_total: number;
+  id?: string;
+};
+
 export default function AdminEvents() {
   const { data: events = [], isLoading } = useEvents(false);
   const queryClient = useQueryClient();
@@ -19,6 +34,9 @@ export default function AdminEvents() {
     category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "",
     featured: false, status: "draft", capacity_total: 0, poster_url: "",
   });
+  const [tiers, setTiers] = useState<TierState[]>(
+    PRESET_TIERS.map((t) => ({ ...t, enabled: false, quantity_total: 0 }))
+  );
 
   const resetForm = () => {
     setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0, poster_url: "" });
@@ -26,6 +44,7 @@ export default function AdminEvents() {
     setShowForm(false);
     setPosterFile(null);
     setPosterPreview(null);
+    setTiers(PRESET_TIERS.map((t) => ({ ...t, enabled: false, quantity_total: 0 })));
   };
 
   const handlePosterSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
