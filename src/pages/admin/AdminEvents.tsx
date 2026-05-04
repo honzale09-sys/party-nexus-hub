@@ -5,6 +5,21 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Copy, Upload, X } from "lucide-react";
 
+const PRESET_TIERS = [
+  { name: "Early Bird", price: 39000 },
+  { name: "First Wave", price: 49000 },
+  { name: "VIP Admission", price: 99000 },
+  { name: "Group Admission", price: 35000 },
+];
+
+type TierState = {
+  name: string;
+  price: number;
+  enabled: boolean;
+  quantity_total: number;
+  id?: string;
+};
+
 export default function AdminEvents() {
   const { data: events = [], isLoading } = useEvents(false);
   const queryClient = useQueryClient();
@@ -19,6 +34,9 @@ export default function AdminEvents() {
     category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "",
     featured: false, status: "draft", capacity_total: 0, poster_url: "",
   });
+  const [tiers, setTiers] = useState<TierState[]>(
+    PRESET_TIERS.map((t) => ({ ...t, enabled: false, quantity_total: 0 }))
+  );
 
   const resetForm = () => {
     setForm({ title: "", slug: "", date: "", time: "22:00", venue_name: "", venue_address: "", category: "club", age_restriction: "18+", dress_code: "", tagline: "", description: "", featured: false, status: "draft", capacity_total: 0, poster_url: "" });
@@ -26,6 +44,7 @@ export default function AdminEvents() {
     setShowForm(false);
     setPosterFile(null);
     setPosterPreview(null);
+    setTiers(PRESET_TIERS.map((t) => ({ ...t, enabled: false, quantity_total: 0 })));
   };
 
   const handlePosterSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,15 +82,37 @@ export default function AdminEvents() {
       const posterUrl = await uploadPoster(slug);
       const { poster_url, ...rest } = form;
       const payload = { ...rest, slug, date: new Date(form.date).toISOString(), poster_url: posterUrl };
+      let eventId = editingId;
       if (editingId) {
         const { error } = await supabase.from("events").update(payload).eq("id", editingId);
         if (error) throw error;
         toast.success("Event updated!");
       } else {
-        const { error } = await supabase.from("events").insert(payload);
+        const { data: inserted, error } = await supabase.from("events").insert(payload).select("id").single();
         if (error) throw error;
+        eventId = inserted.id;
         toast.success("Event created!");
       }
+
+      // Sync ticket tiers
+      if (eventId) {
+        for (const t of tiers) {
+          const tierPayload = {
+            event_id: eventId,
+            name: t.name,
+            price: t.price,
+            currency: "CZK",
+            visible: t.enabled,
+            quantity_total: t.quantity_total || 0,
+          };
+          if (t.id) {
+            await supabase.from("ticket_tiers").update(tierPayload).eq("id", t.id);
+          } else if (t.enabled) {
+            await supabase.from("ticket_tiers").insert(tierPayload);
+          }
+        }
+      }
+
       queryClient.invalidateQueries({ queryKey: ["events"] });
       resetForm();
     } catch (err: any) {
@@ -91,6 +132,23 @@ export default function AdminEvents() {
     setPosterFile(null);
     setEditingId(e.id);
     setShowForm(true);
+    // Hydrate tier state from existing tiers + presets
+    const existing: any[] = e.ticket_tiers || [];
+    setTiers(
+      PRESET_TIERS.map((preset) => {
+        const match = existing.find((x) => x.name === preset.name);
+        if (match) {
+          return {
+            id: match.id,
+            name: match.name,
+            price: match.price,
+            enabled: match.visible,
+            quantity_total: match.quantity_total || 0,
+          };
+        }
+        return { ...preset, enabled: false, quantity_total: 0 };
+      })
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -179,6 +237,59 @@ export default function AdminEvents() {
               <option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option>
             </select>
           </div>
+
+          {/* Ticket Tiers */}
+          <div className="space-y-3">
+            <h3 className="font-display font-semibold text-base">Ticket Pricing</h3>
+            <p className="text-xs text-muted-foreground">Toggle each tier on/off. Price is in CZK (cents — e.g. 39000 = 390 Kč).</p>
+            <div className="space-y-2">
+              {tiers.map((t, idx) => (
+                <div key={t.name} className="grid grid-cols-12 gap-2 items-center rounded-lg border border-border bg-background/50 p-3">
+                  <label className="col-span-12 sm:col-span-4 flex items-center gap-2 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, enabled: e.target.checked };
+                        setTiers(next);
+                      }}
+                    />
+                    {t.name}
+                  </label>
+                  <div className="col-span-6 sm:col-span-4">
+                    <label className="text-xs text-muted-foreground">Price (CZK cents)</label>
+                    <input
+                      type="number"
+                      value={t.price}
+                      disabled={!t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, price: parseInt(e.target.value) || 0 };
+                        setTiers(next);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="col-span-6 sm:col-span-4">
+                    <label className="text-xs text-muted-foreground">Quantity</label>
+                    <input
+                      type="number"
+                      value={t.quantity_total}
+                      disabled={!t.enabled}
+                      onChange={(e) => {
+                        const next = [...tiers];
+                        next[idx] = { ...t, quantity_total: parseInt(e.target.value) || 0 };
+                        setTiers(next);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="flex gap-3">
             <button onClick={handleSave} disabled={uploading} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">{uploading ? "Uploading..." : "Save"}</button>
             <button onClick={resetForm} className="px-6 py-2 rounded-lg bg-muted text-foreground text-sm">Cancel</button>
