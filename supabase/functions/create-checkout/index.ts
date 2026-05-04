@@ -215,6 +215,14 @@ serve(async (req) => {
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/payment-cancelled`,
       metadata,
+      // Collect shipping address for merch orders
+      ...(hasProducts ? {
+        shipping_address_collection: {
+          allowed_countries: ["CZ", "SK", "DE", "AT", "PL", "HU", "FR", "IT", "ES", "NL", "BE", "GB", "IE", "DK", "SE", "FI", "NO", "PT", "LU", "CH", "US"],
+        },
+        phone_number_collection: { enabled: true },
+        billing_address_collection: "auto",
+      } : {}),
       ...(discounts ? { discounts } : { allow_promotion_codes: false }),
     });
 
