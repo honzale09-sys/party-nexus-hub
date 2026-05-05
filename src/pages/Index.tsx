@@ -18,10 +18,6 @@ export default function Index() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative text-center px-4 z-10">
-          <h1 className="font-display text-5xl md:text-7xl font-bold text-gradient mb-4">ONE BIG PARTY</h1>
-          <p className="text-foreground/80 text-lg">Prague's premier nightlife experience</p>
-        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background pointer-events-none" />
       </section>
 
