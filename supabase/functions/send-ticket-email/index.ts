@@ -268,7 +268,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "One Big Party <tickets@onebigparty.cz>",
+         from: "One Big Party <info@onebigparty.net>",
         to: [order.customer_email],
         subject: event ? `Your tickets for ${event.title}` : "Your tickets are ready!",
         html: emailHtml,
