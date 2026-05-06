@@ -190,7 +190,7 @@ export default function EventDetail() {
               {[
                 { title: "Entry Rules", text: "Valid ID required. No re-entry. No outside drinks." },
                 { title: "Refund Policy", text: "Full refund 48+ hours before event. No refunds after." },
-                { title: "Need Help?", text: "Email support@onebigparty.cz or use the Contact page." },
+                 { title: "Need Help?", text: "Email info@onebigparty.net or use the Contact page." },
               ].map((b) => (
                 <motion.div key={b.title} variants={fadeUp} transition={smoothTransition} className="p-4 rounded-xl bg-muted">
                   <h4 className="text-sm font-semibold mb-1">{b.title}</h4>

@@ -14,9 +14,9 @@ export default function Privacy() {
           <h2 className="text-foreground font-display font-semibold text-lg">4. Data Storage</h2>
           <p>Your data is stored securely on servers within the European Union and protected with industry-standard encryption.</p>
           <h2 className="text-foreground font-display font-semibold text-lg">5. Your Rights (GDPR)</h2>
-          <p>You have the right to access, correct, delete, or export your personal data. Contact us at privacy@onebigparty.cz to exercise these rights.</p>
+           <p>You have the right to access, correct, delete, or export your personal data. Contact us at info@onebigparty.net to exercise these rights.</p>
           <h2 className="text-foreground font-display font-semibold text-lg">6. Contact</h2>
-          <p>For privacy inquiries: privacy@onebigparty.cz</p>
+           <p>For privacy inquiries: info@onebigparty.net</p>
         </div>
       </section>
     </div>
