@@ -4,7 +4,7 @@ import { toast } from "sonner";
 export default function AdminSettings() {
   const [settings, setSettings] = useState({
     business_name: "ONE BIG PARTY",
-    support_email: "hello@onebigparty.cz",
+     support_email: "info@onebigparty.net",
     instagram: "",
     facebook: "",
     twitter: "",

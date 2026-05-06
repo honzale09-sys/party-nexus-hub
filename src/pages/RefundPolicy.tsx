@@ -14,7 +14,7 @@ export default function RefundPolicy() {
           <p><strong>Wrong size:</strong> Exchanges available within 14 days if the item is unworn and in original packaging.</p>
           <p><strong>Change of mind:</strong> No refunds for non-defective merchandise.</p>
           <h2 className="text-foreground font-display font-semibold text-lg">How to Request a Refund</h2>
-          <p>Email refunds@onebigparty.cz with your order ID, email address, and reason for the refund request. We aim to respond within 2 business days.</p>
+           <p>Email info@onebigparty.net with your order ID, email address, and reason for the refund request. We aim to respond within 2 business days.</p>
         </div>
       </section>
     </div>
