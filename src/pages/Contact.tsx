@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Mail, Instagram, Facebook, Twitter, Clock, MessageSquare } from "lucide-react";
+import { Mail, Instagram, Clock, MessageSquare } from "lucide-react";
 
 export default function Contact() {
   return (
@@ -54,15 +54,15 @@ export default function Contact() {
             <div>
               <h3 className="font-semibold mb-3">Follow Us</h3>
               <div className="flex gap-3">
-                {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all"
-                  >
-                    <Icon size={18} />
-                  </a>
-                ))}
+                <a
+                  href="https://www.instagram.com/1big.party/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all"
+                >
+                  <Instagram size={18} />
+                </a>
               </div>
             </div>
 

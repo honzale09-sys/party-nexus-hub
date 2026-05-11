@@ -59,7 +59,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
           transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="text-xs tracking-[0.4em] uppercase text-muted-foreground font-display"
         >
-          Prague's Premium Nightlife
+          Prague's Wildest Nightlife
         </motion.p>
       </motion.div>
     </AnimatePresence>

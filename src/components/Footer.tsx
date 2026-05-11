@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "@/assets/logo.png";
 import { fadeUp, staggerContainer, smoothTransition } from "@/hooks/useScrollReveal";
@@ -12,9 +12,7 @@ const footerLinks = [
 ];
 
 const socials = [
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Twitter, href: "#", label: "X / Twitter" },
+  { icon: Instagram, href: "https://www.instagram.com/1big.party/", label: "Instagram" },
 ];
 
 export default function Footer() {
@@ -31,7 +29,7 @@ export default function Footer() {
           <motion.div variants={fadeUp} transition={smoothTransition}>
             <img src={logo} alt="ONE BIG PARTY" className="h-12 w-auto mb-3" />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Prague's premium nightlife experience. Curated events, verified tickets, unforgettable nights.
+              Prague's wildest nightlife experience. Curated events, unforgettable nights.
             </p>
           </motion.div>
 
@@ -55,6 +53,8 @@ export default function Footer() {
                 <a
                   key={s.label}
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
                   className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200 active:scale-[0.95]"
                 >
