@@ -45,7 +45,7 @@ export default function EventDetail() {
             className="lg:col-span-2 rounded-xl overflow-hidden glow-purple"
           >
             {event.poster_url ? (
-              <img src={event.poster_url} alt={event.title} className="w-full aspect-[3/4] object-cover" />
+              <img src={event.poster_url} alt={event.title} className="w-full h-auto object-contain" />
             ) : (
               <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center text-8xl">🎵</div>
             )}
