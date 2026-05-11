@@ -11,13 +11,16 @@ export default function Index() {
       {/* Hero placeholder — video coming soon */}
       <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden bg-background flex items-center justify-center">
         <video
-          src="/hero.mov"
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
-        />
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+          <source src="/hero.mov" type="video/quicktime" />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background pointer-events-none" />
       </section>
 
