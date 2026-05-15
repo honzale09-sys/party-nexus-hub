@@ -40,8 +40,14 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [loading, setLoading] = useState(true);
-  const handleLoadingComplete = useCallback(() => setLoading(false), []);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return sessionStorage.getItem("obp_loaded") !== "1";
+  });
+  const handleLoadingComplete = useCallback(() => {
+    sessionStorage.setItem("obp_loaded", "1");
+    setLoading(false);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
